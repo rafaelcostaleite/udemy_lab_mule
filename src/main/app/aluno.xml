@@ -42,6 +42,6 @@ set nome = #[message.payload.nome]
 , email = #[message.payload.email] 
 where rm = #[message.payload.rm]]]></db:parameterized-query>
         </db:update>
-        <set-payload value="Sucesso - recurso alterado no banco" doc:name="Set Payload"/>
+        <set-payload value="Sucesso - Recurso alterado no banco" doc:name="Set Payload"/>
     </flow>
 </mule>
