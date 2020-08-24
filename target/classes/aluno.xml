@@ -12,7 +12,7 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
     <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
     <db:mysql-config name="MySQL_Configuration" host="localhost" port="3306" user="dev" password="123456desenv" database="udemy" doc:name="MySQL Configuration"/>
     <flow name="alunoFlow">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="/aluno/{id}" allowedMethods="GET" doc:name="alunoFlow-get"/>
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/aluno/{id}" allowedMethods="GET" doc:name="HTTP"/>
         <set-variable variableName="idvar" value="#[message.inboundProperties.'http.uri.params'.id]" doc:name="Variable"/>
         <logger message="O valor da variavel ID passado na url foi: #[flowVars.idvar]" level="INFO" doc:name="Logger"/>
     </flow>
