@@ -32,4 +32,16 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
         </db:insert>
         <set-payload value="Sucesso - recurso inserido no banco" doc:name="Set Payload"/>
     </flow>
+    <flow name="alunoFlow-PUT">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/alunodb" allowedMethods="PUT" doc:name="HTTP"/>
+        <json:json-to-object-transformer returnClass="java.lang.Object" doc:name="JSON to Object"/>
+        <db:update config-ref="MySQL_Configuration" doc:name="Database">
+            <db:parameterized-query><![CDATA[update udemy.aluno 
+set nome = #[message.payload.nome]
+, telefone = #[message.payload.telefone]
+, email = #[message.payload.email] 
+where rm = #[message.payload.rm]]]></db:parameterized-query>
+        </db:update>
+        <set-payload value="Sucesso - recurso alterado no banco" doc:name="Set Payload"/>
+    </flow>
 </mule>
