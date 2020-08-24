@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
+    <db:mysql-config name="MySQL_Configuration" host="localhost" port="3306" user="dev" password="123456desenv" database="udemy" doc:name="MySQL Configuration"/>
+    <flow name="alunoFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/aluno/{id}" allowedMethods="GET" doc:name="alunoFlow-get"/>
+        <set-variable variableName="idvar" value="#[message.inboundProperties.'http.uri.params'.id]" doc:name="Variable"/>
+        <logger message="O valor da variavel ID passado na url foi: #[flowVars.idvar]" level="INFO" doc:name="Logger"/>
+    </flow>
+    <flow name="alunoFlow-get">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/alunodb/{id}" allowedMethods="GET" doc:name="HTTP"/>
+        <set-variable variableName="id_aluno" value="#[message.inboundProperties.'http.uri.params'.id]" doc:name="Variable"/>
+        <db:select config-ref="MySQL_Configuration" doc:name="Database">
+            <db:parameterized-query><![CDATA[select * from udemy.aluno where rm = #[flowVars.id_aluno]]]></db:parameterized-query>
+        </db:select>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+    </flow>
+    <flow name="alunoFlow-POST">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/alunodb" allowedMethods="POST" doc:name="HTTP"/>
+        <json:json-to-object-transformer returnClass="java.lang.Object" doc:name="JSON to Object"/>
+        <db:insert config-ref="MySQL_Configuration" doc:name="Database">
+            <db:parameterized-query><![CDATA[insert into udemy.aluno (rm,nome,telefone,email) values (#[message.payload.rm],#[message.payload.nome],#[message.payload.telefone],#[message.payload.email])]]></db:parameterized-query>
+        </db:insert>
+        <set-payload value="Sucesso - recurso inserido no banco" doc:name="Set Payload"/>
+    </flow>
+</mule>
